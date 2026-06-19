@@ -130,7 +130,8 @@ impl<'a> DerivedModule<'a> {
                     | TypeInner::Sampler { .. }
                     | TypeInner::Atomic { .. }
                     | TypeInner::AccelerationStructure { .. }
-                    | TypeInner::RayQuery { .. } => ty.inner.clone(),
+                    | TypeInner::RayQuery { .. }
+                    | TypeInner::HitObject => ty.inner.clone(),
                     TypeInner::Pointer { base, space } => TypeInner::Pointer {
                         base: self.import_type(base),
                         space: *space,
