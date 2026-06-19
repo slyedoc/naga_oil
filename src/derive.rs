@@ -526,7 +526,42 @@ impl<'a> DerivedModule<'a> {
                     | Statement::MemoryBarrier(_)
                     | Statement::ControlBarrier(_) => stmt.clone(),
                     Statement::RayPipelineFunction(ray_pipeline_function) => {
-                        Statement::RayPipelineFunction(*ray_pipeline_function)
+                        use naga::RayPipelineFunction as Rpf;
+                        // Remap the inner expression handles — the previous
+                        // clone-as-is left them pointing at pre-import indices
+                        // (corrupting trace/SER args after composition).
+                        Statement::RayPipelineFunction(match ray_pipeline_function {
+                            Rpf::TraceRay {
+                                acceleration_structure,
+                                descriptor,
+                                payload,
+                            } => Rpf::TraceRay {
+                                acceleration_structure: map_expr!(acceleration_structure),
+                                descriptor: map_expr!(descriptor),
+                                payload: map_expr!(payload),
+                            },
+                            Rpf::HitObjectTraceRay {
+                                hit_object,
+                                acceleration_structure,
+                                descriptor,
+                                payload,
+                            } => Rpf::HitObjectTraceRay {
+                                hit_object: map_expr!(hit_object),
+                                acceleration_structure: map_expr!(acceleration_structure),
+                                descriptor: map_expr!(descriptor),
+                                payload: map_expr!(payload),
+                            },
+                            Rpf::ReorderThread { hit_object } => Rpf::ReorderThread {
+                                hit_object: map_expr!(hit_object),
+                            },
+                            Rpf::HitObjectExecuteShader {
+                                hit_object,
+                                payload,
+                            } => Rpf::HitObjectExecuteShader {
+                                hit_object: map_expr!(hit_object),
+                                payload: map_expr!(payload),
+                            },
+                        })
                     }
                     Statement::CooperativeStore { target, data } => Statement::CooperativeStore {
                         target: map_expr!(target),
