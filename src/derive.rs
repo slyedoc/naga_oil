@@ -807,6 +807,10 @@ impl<'a> DerivedModule<'a> {
                 hit_object: map_expr!(hit_object),
                 query: *query,
             },
+            Expression::PhysicalLoad { address, pointee } => Expression::PhysicalLoad {
+                address: map_expr!(address),
+                pointee: self.import_type(pointee),
+            },
             Expression::Override(h_override) => {
                 is_external = true;
                 Expression::Override(self.import_pipeline_override(h_override))
