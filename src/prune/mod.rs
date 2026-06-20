@@ -255,6 +255,10 @@ impl FunctionReq {
             Expression::SubgroupBallotResult => expr.clone(),
             Expression::SubgroupOperationResult { .. } => expr.clone(),
             Expression::RayQueryVertexPositions { query, committed } => todo!(),
+            Expression::HitObjectGet { hit_object, query } => Expression::HitObjectGet {
+                hit_object: expr_map[hit_object],
+                query: *query,
+            },
         }
     }
 

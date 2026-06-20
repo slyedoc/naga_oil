@@ -64,6 +64,7 @@ impl Redirector {
                 | Statement::Return { .. }
                 | Statement::WorkGroupUniformLoad { .. }
                 | Statement::Kill
+                | Statement::RayTerminate(_)
                 | Statement::MemoryBarrier(_)
                 | Statement::ControlBarrier(_)
                 | Statement::Store { .. }

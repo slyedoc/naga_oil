@@ -523,6 +523,7 @@ impl<'a> DerivedModule<'a> {
                     Statement::Break
                     | Statement::Continue
                     | Statement::Kill
+                    | Statement::RayTerminate(_)
                     | Statement::MemoryBarrier(_)
                     | Statement::ControlBarrier(_) => stmt.clone(),
                     Statement::RayPipelineFunction(ray_pipeline_function) => {
@@ -551,8 +552,14 @@ impl<'a> DerivedModule<'a> {
                                 descriptor: map_expr!(descriptor),
                                 payload: map_expr!(payload),
                             },
-                            Rpf::ReorderThread { hit_object } => Rpf::ReorderThread {
+                            Rpf::ReorderThread {
+                                hit_object,
+                                hint,
+                                hint_bits,
+                            } => Rpf::ReorderThread {
                                 hit_object: map_expr!(hit_object),
+                                hint: map_expr_opt!(hint),
+                                hint_bits: map_expr_opt!(hint_bits),
                             },
                             Rpf::HitObjectExecuteShader {
                                 hit_object,
@@ -796,6 +803,10 @@ impl<'a> DerivedModule<'a> {
                     committed: *committed,
                 }
             }
+            Expression::HitObjectGet { hit_object, query } => Expression::HitObjectGet {
+                hit_object: map_expr!(hit_object),
+                query: *query,
+            },
             Expression::Override(h_override) => {
                 is_external = true;
                 Expression::Override(self.import_pipeline_override(h_override))
