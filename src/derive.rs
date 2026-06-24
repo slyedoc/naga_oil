@@ -819,6 +819,7 @@ impl<'a> DerivedModule<'a> {
                 hit_object: map_expr!(hit_object),
                 query: *query,
             },
+            Expression::ReadClock => Expression::ReadClock,
             Expression::PhysicalLoad { address, pointee } => Expression::PhysicalLoad {
                 address: map_expr!(address),
                 pointee: self.import_type(pointee),

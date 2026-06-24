@@ -259,6 +259,7 @@ impl FunctionReq {
                 hit_object: expr_map[hit_object],
                 query: *query,
             },
+            Expression::ReadClock => Expression::ReadClock,
             Expression::PhysicalLoad { address, pointee } => Expression::PhysicalLoad {
                 address: expr_map[address],
                 pointee: *pointee,
