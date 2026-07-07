@@ -131,7 +131,8 @@ impl<'a> DerivedModule<'a> {
                     | TypeInner::Atomic { .. }
                     | TypeInner::AccelerationStructure { .. }
                     | TypeInner::RayQuery { .. }
-                    | TypeInner::HitObject => ty.inner.clone(),
+                    | TypeInner::HitObject
+                    | TypeInner::CooperativeVector { .. } => ty.inner.clone(),
                     TypeInner::Pointer { base, space } => TypeInner::Pointer {
                         base: self.import_type(base),
                         space: *space,
@@ -584,7 +585,20 @@ impl<'a> DerivedModule<'a> {
                     }
                     Statement::CooperativeStore { target, data } => Statement::CooperativeStore {
                         target: map_expr!(target),
-                        data: *data,
+                        data: naga::CooperativeData {
+                            pointer: map_expr!(&data.pointer),
+                            stride: map_expr!(&data.stride),
+                            row_major: data.row_major,
+                        },
+                    },
+                    Statement::CooperativeVectorStore {
+                        pointer,
+                        offset,
+                        value,
+                    } => Statement::CooperativeVectorStore {
+                        pointer: map_expr!(pointer),
+                        offset: map_expr!(offset),
+                        value: map_expr!(value),
                     },
                 }
             })
@@ -841,12 +855,35 @@ impl<'a> DerivedModule<'a> {
                 columns: *columns,
                 rows: *rows,
                 role: *role,
-                data: *data,
+                data: naga::CooperativeData {
+                    pointer: map_expr!(&data.pointer),
+                    stride: map_expr!(&data.stride),
+                    row_major: data.row_major,
+                },
             },
             Expression::CooperativeMultiplyAdd { a, b, c } => Expression::CooperativeMultiplyAdd {
                 a: map_expr!(a),
                 b: map_expr!(b),
                 c: map_expr!(c),
+            },
+            Expression::CooperativeVectorOp {
+                op,
+                size,
+                scalar,
+                a,
+                b,
+                c,
+                d,
+                e,
+            } => Expression::CooperativeVectorOp {
+                op: *op,
+                size: *size,
+                scalar: *scalar,
+                a: map_expr_opt!(a),
+                b: map_expr_opt!(b),
+                c: map_expr_opt!(c),
+                d: map_expr_opt!(d),
+                e: map_expr_opt!(e),
             },
         };
 

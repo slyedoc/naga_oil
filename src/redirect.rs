@@ -76,7 +76,8 @@ impl Redirector {
                 | Statement::SubgroupCollectiveOperation { .. }
                 | Statement::ImageAtomic { .. }
                 | Statement::RayPipelineFunction(..)
-                | Statement::CooperativeStore { .. } => (),
+                | Statement::CooperativeStore { .. }
+                | Statement::CooperativeVectorStore { .. } => (),
             }
         }
     }
